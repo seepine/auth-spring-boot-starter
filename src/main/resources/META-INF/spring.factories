@@ -1,0 +1,10 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.seepine.auth.config.AuthAutoConfigurer,\
+  com.seepine.auth.config.ServiceAutoConfigurer,\
+  com.seepine.auth.config.InterceptorConfig,\
+  com.seepine.auth.util.AuthUtil,\
+  com.seepine.auth.exception.AuthExceptionResponseBodyAdvice,\
+  com.seepine.auth.aspect.RateLimitAspect,\
+  com.seepine.auth.util.RateLimitUtil,\
+  com.seepine.auth.aspect.PermissionAspect,\
+  com.seepine.auth.aspect.LogAspect
