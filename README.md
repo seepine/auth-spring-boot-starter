@@ -11,7 +11,7 @@ easy auth for springboot
 <dependency>
   <groupId>com.seepine</groupId>
   <artifactId>spring-boot-starter-auth</artifactId>
-  <version>2.0.0-beta.9</version>
+  <version>2.0.0-beta.10</version>
 </dependency>
 ```
 
