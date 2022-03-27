@@ -122,14 +122,6 @@ public class AuthUtil {
   public static String login(Object user, List<String> permission) {
     String token = authUtil.snowflakeIdUtil.nextIdString();
     putIntoCache(token, user, permission);
-    // 设置用户信息过期时间
-    authUtil.redisTemplate.expire(
-        getUserKey(token), authUtil.authProperties.getTimeout(), authUtil.authProperties.getUnit());
-    // 设置用户权限过期时间
-    authUtil.redisTemplate.expire(
-        getPermissionKey(token),
-        authUtil.authProperties.getTimeout(),
-        authUtil.authProperties.getUnit());
     return token;
   }
 
@@ -163,16 +155,7 @@ public class AuthUtil {
 
     // 刷新缓存
     if (authUtil.authProperties.getResetTimeout()) {
-      // 刷新用户信息缓存
-      authUtil.redisTemplate.expire(
-          getUserKey(token),
-          authUtil.authProperties.getTimeout(),
-          authUtil.authProperties.getUnit());
-      // 刷新用户权限缓存
-      authUtil.redisTemplate.expire(
-          getPermissionKey(token),
-          authUtil.authProperties.getTimeout(),
-          authUtil.authProperties.getUnit());
+      refresh();
     }
     return true;
   }
@@ -212,6 +195,13 @@ public class AuthUtil {
     }
   }
 
+  /**
+   * 供登录或刷新用户及权限方法用
+   *
+   * @param token token
+   * @param user 用户信息
+   * @param permission 权限信息
+   */
   private static void putIntoCache(String token, Object user, List<String> permission) {
     if (StrUtil.isNotBlank(token)) {
       authUtil.THREAD_LOCAL_TOKEN.set(token);
@@ -221,6 +211,7 @@ public class AuthUtil {
       if (permission != null) {
         authUtil.redisTemplate.opsForHash().put(getPermissionKey(token), token, permission);
       }
+      refresh();
     }
     // 允许未登录调用此方法设置当前登录者信息及权限，方便后续逻辑获取用户权限
     if (user != null) {
