@@ -44,8 +44,12 @@ public class PermissionInterceptor implements HandlerInterceptor {
       }
     }
     if (permission != null) {
+      PermissionPrefix prefix = handlerMethod.getBeanType().getAnnotation(PermissionPrefix.class);
       PermissionUtil.verify(
-          permission, method.getDeclaringClass().getAnnotation(PermissionPrefix.class));
+          permission,
+          prefix == null
+              ? method.getDeclaringClass().getAnnotation(PermissionPrefix.class)
+              : prefix);
     }
     return true;
   }
