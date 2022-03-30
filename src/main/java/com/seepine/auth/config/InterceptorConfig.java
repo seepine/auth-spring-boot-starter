@@ -31,7 +31,8 @@ public class InterceptorConfig implements WebMvcConfigurer {
           .addInterceptor(new SecretInterceptor(authProperties, secretService))
           .addPathPatterns("/**")
           .excludePathPatterns("/error")
-          .excludePathPatterns(authProperties.getExcludeSecretPath());
+          .excludePathPatterns(authProperties.getExcludeSecretPath())
+          .order(authProperties.getInterceptorOrder());
     }
     // 拦截非@Expose注解
     if (authProperties.isEnableAuth()) {
@@ -39,9 +40,13 @@ public class InterceptorConfig implements WebMvcConfigurer {
           .addInterceptor(new AuthenticationInterceptor(authProperties))
           .addPathPatterns("/**")
           .excludePathPatterns("/error")
-          .excludePathPatterns(authProperties.getExcludePath());
+          .excludePathPatterns(authProperties.getExcludePath())
+          .order(authProperties.getInterceptorOrder() + 100);
     }
     // 拦截@Permission注解
-    registry.addInterceptor(new PermissionInterceptor()).addPathPatterns("/**");
+    registry
+        .addInterceptor(new PermissionInterceptor())
+        .addPathPatterns("/**")
+        .order(authProperties.getInterceptorOrder() + 200);
   }
 }

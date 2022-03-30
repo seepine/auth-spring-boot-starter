@@ -30,6 +30,8 @@ public class AuthProperties {
   Boolean resetTimeout = false;
   /** secret允许超时毫秒数，默认4小时 */
   long secretTimeout = 4 * 60 * 60 * 1000;
+  /** 拦截器order值 */
+  int interceptorOrder = Integer.MIN_VALUE;
 
   boolean enableSecret = false;
   boolean enableAuth = true;
@@ -48,6 +50,11 @@ public class AuthProperties {
   public AuthProperties rsaPrivateKey(String rsaPrivateKey, String rsaOldPrivateKey) {
     this.rsaPrivateKey = rsaPrivateKey;
     this.rsaOldPrivateKey = rsaOldPrivateKey;
+    return this;
+  }
+
+  public AuthProperties interceptorOrder(int interceptorOrder) {
+    this.interceptorOrder = interceptorOrder;
     return this;
   }
 
