@@ -1,9 +1,9 @@
 package com.seepine.auth.enums;
 
 public enum AuthExceptionType {
-  NOT_TOKEN("请先登陆"),
-  INVALID_TOKEN("请先登陆"),
-  EXPIRED_LOGIN("登陆过期"),
+  NOT_TOKEN("请先登录"),
+  INVALID_TOKEN("请先登录"),
+  EXPIRED_LOGIN("登录过期"),
   NOT_PERMISSION("没有权限"),
   NOT_SECRET("请求错误"),
   INVALID_SECRET("请求无效"),
