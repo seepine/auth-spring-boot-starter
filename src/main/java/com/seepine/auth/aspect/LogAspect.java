@@ -29,6 +29,8 @@ public class LogAspect {
    * 切面请求频率限制
    *
    * @param joinPoint joinPoint
+   * @return obj
+   * @throws Throwable e
    */
   @Around("logPointCut()")
   public Object doAfter(ProceedingJoinPoint joinPoint) throws Throwable {

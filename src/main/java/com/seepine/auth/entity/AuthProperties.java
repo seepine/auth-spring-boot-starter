@@ -2,11 +2,12 @@ package com.seepine.auth.entity;
 
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.core.Ordered;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * auth参数类
@@ -22,16 +23,14 @@ public class AuthProperties {
   String secretHeader = "secret";
   /** 缓存前缀 */
   String cacheKey = "com.seepine.auth";
-  /** token过期时间数 */
-  long timeout = 3;
-  /** token过期时间类型 */
-  TimeUnit unit = TimeUnit.DAYS;
+  /** token过期时间,默认3天 */
+  Duration timeout = Duration.ofDays(3);
   /** 是否自动重置token过期时间 */
   Boolean resetTimeout = false;
-  /** secret允许超时毫秒数，默认4小时 */
-  long secretTimeout = 4 * 60 * 60 * 1000;
-  /** 拦截器order值 */
-  int interceptorOrder = Integer.MIN_VALUE;
+  /** secret允许超时毫秒数，默认10分钟 */
+  long secretTimeout = 10 * 60 * 1000;
+  /** 拦截器order值,默认为最高级 */
+  int interceptorOrder = Ordered.HIGHEST_PRECEDENCE;
 
   boolean enableSecret = false;
   boolean enableAuth = true;
@@ -103,15 +102,18 @@ public class AuthProperties {
     return this;
   }
 
-  public AuthProperties timeout(long timeout, TimeUnit unit) {
-    this.timeout = timeout;
-    this.unit = unit;
+  public AuthProperties timeout(Duration duration) {
+    this.timeout = duration;
     return this;
   }
 
-  public AuthProperties timeout(long timeout, TimeUnit unit, Boolean resetTimeout) {
-    this.timeout = timeout;
-    this.unit = unit;
+  public AuthProperties timeout(Duration duration, Boolean resetTimeout) {
+    this.timeout = duration;
+    this.resetTimeout = resetTimeout;
+    return this;
+  }
+
+  public AuthProperties resetTimeout(Boolean resetTimeout) {
     this.resetTimeout = resetTimeout;
     return this;
   }

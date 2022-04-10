@@ -4,23 +4,20 @@ import com.seepine.auth.entity.AuthProperties;
 import com.seepine.auth.enums.AuthExceptionType;
 import com.seepine.auth.exception.AuthException;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author seepine
  */
 @Component
-@DependsOn({"redisTemplate", "authProperties"})
+@DependsOn({"authProperties"})
 public class AuthUtil {
   private static AuthUtil authUtil;
-  @Resource private RedisTemplate<String, Object> redisTemplate;
   @Resource private AuthProperties authProperties;
   SnowflakeIdUtil snowflakeIdUtil = new SnowflakeIdUtil(0, 0);
 
@@ -33,7 +30,6 @@ public class AuthUtil {
   @PostConstruct
   public void init() {
     authUtil = this;
-    authUtil.redisTemplate = this.redisTemplate;
     authUtil.authProperties = this.authProperties;
   }
 
@@ -81,8 +77,7 @@ public class AuthUtil {
     } catch (Exception ignored) {
     }
     if (StrUtil.isNotBlank(authUtil.THREAD_LOCAL_TOKEN.get())) {
-      authUtil.redisTemplate.expire(
-          getUserKey(authUtil.THREAD_LOCAL_TOKEN.get()), 1, TimeUnit.MILLISECONDS);
+      RedissonUtil.remove(getUserKey(authUtil.THREAD_LOCAL_TOKEN.get()));
     }
     throw new AuthException(AuthExceptionType.EXPIRED_LOGIN);
   }
@@ -98,8 +93,7 @@ public class AuthUtil {
     } catch (Exception ignored) {
     }
     if (StrUtil.isNotBlank(authUtil.THREAD_LOCAL_TOKEN.get())) {
-      authUtil.redisTemplate.expire(
-          getPermissionKey(authUtil.THREAD_LOCAL_TOKEN.get()), 1, TimeUnit.MILLISECONDS);
+      RedissonUtil.remove(getPermissionKey(authUtil.THREAD_LOCAL_TOKEN.get()));
     }
     throw new AuthException(AuthExceptionType.EXPIRED_LOGIN);
   }
@@ -139,7 +133,7 @@ public class AuthUtil {
     authUtil.THREAD_LOCAL_TOKEN.set(token);
 
     // 用户相关
-    Object user = authUtil.redisTemplate.opsForHash().get(getUserKey(token), token);
+    Object user = RedissonUtil.get(getUserKey(token));
     if (user == null) {
       return false;
     }
@@ -147,8 +141,7 @@ public class AuthUtil {
 
     // 权限相关
     List<String> permission =
-        ListUtil.castList(
-            authUtil.redisTemplate.opsForHash().get(getPermissionKey(token), token), String.class);
+        ListUtil.castList(RedissonUtil.get(getPermissionKey(token)), String.class);
     if (permission != null) {
       authUtil.THREAD_LOCAL_PERMISSION.set(permission);
     }
@@ -183,15 +176,9 @@ public class AuthUtil {
     String token = authUtil.THREAD_LOCAL_TOKEN.get();
     if (StrUtil.isNotBlank(token)) {
       // 刷新用户信息缓存
-      authUtil.redisTemplate.expire(
-          getUserKey(token),
-          authUtil.authProperties.getTimeout(),
-          authUtil.authProperties.getUnit());
+      RedissonUtil.expire(getUserKey(token), authUtil.authProperties.getTimeout());
       // 刷新用户权限缓存
-      authUtil.redisTemplate.expire(
-          getPermissionKey(token),
-          authUtil.authProperties.getTimeout(),
-          authUtil.authProperties.getUnit());
+      RedissonUtil.expire(getPermissionKey(token), authUtil.authProperties.getTimeout());
     }
   }
 
@@ -206,10 +193,10 @@ public class AuthUtil {
     if (StrUtil.isNotBlank(token)) {
       authUtil.THREAD_LOCAL_TOKEN.set(token);
       if (user != null) {
-        authUtil.redisTemplate.opsForHash().put(getUserKey(token), token, user);
+        RedissonUtil.set(getUserKey(token), user);
       }
       if (permission != null) {
-        authUtil.redisTemplate.opsForHash().put(getPermissionKey(token), token, permission);
+        RedissonUtil.set(getPermissionKey(token), permission);
       }
       refresh();
     }
@@ -226,8 +213,8 @@ public class AuthUtil {
   public static void logout() {
     String token = authUtil.THREAD_LOCAL_TOKEN.get();
     if (StrUtil.isNotBlank(token)) {
-      authUtil.redisTemplate.expire(getUserKey(token), 1, TimeUnit.MILLISECONDS);
-      authUtil.redisTemplate.expire(getPermissionKey(token), 1, TimeUnit.MILLISECONDS);
+      RedissonUtil.remove(getUserKey(token));
+      RedissonUtil.remove(getPermissionKey(token));
     }
   }
 }

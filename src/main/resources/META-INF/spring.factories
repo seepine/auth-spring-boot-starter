@@ -1,4 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.seepine.auth.util.RedissonUtil,\
   com.seepine.auth.config.AuthAutoConfigurer,\
   com.seepine.auth.config.ServiceAutoConfigurer,\
   com.seepine.auth.config.InterceptorConfig,\
