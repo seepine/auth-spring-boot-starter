@@ -2,12 +2,7 @@ package com.seepine.auth.util;
 
 import com.seepine.auth.entity.RateLimitEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -19,21 +14,11 @@ import java.util.concurrent.TimeUnit;
  * @author seepine
  */
 @Slf4j
-@Component
-@DependsOn("redisTemplate")
 public class RateLimitUtil {
-  @Resource private RedisTemplate<String, Object> redisTemplate;
-  private static RateLimitUtil SINGLE;
-  private static final String LIMIT_KEY = "com.seepine.rate_limit:";
+  private static final String LIMIT_KEY = "com.seepine.auth.rate_limit:";
   private static final Base64.Encoder base64Encoder = Base64.getEncoder();
 
   private RateLimitUtil() {}
-
-  @PostConstruct
-  public void init() {
-    SINGLE = this;
-    SINGLE.redisTemplate = this.redisTemplate;
-  }
 
   /**
    * 验证是否速率限制
@@ -47,7 +32,7 @@ public class RateLimitUtil {
    */
   public static boolean verify(int second, int minute, int hour, int day, boolean global) {
     String uniqueId = getUniqueId(global);
-    Object cache = SINGLE.redisTemplate.opsForValue().get(LIMIT_KEY + uniqueId);
+    Object cache = RedissonUtil.get(LIMIT_KEY + uniqueId);
     RateLimitEntity entity;
     try {
       if (cache == null) {
@@ -57,7 +42,7 @@ public class RateLimitUtil {
     } catch (Exception e) {
       entity = new RateLimitEntity();
       entity.init();
-      SINGLE.redisTemplate.opsForValue().set(LIMIT_KEY + uniqueId, entity);
+      RedissonUtil.set(LIMIT_KEY + uniqueId, entity, 25, TimeUnit.HOURS);
       return true;
     }
     LocalDateTime now = LocalDateTime.now();
@@ -109,8 +94,7 @@ public class RateLimitUtil {
         }
       }
     }
-    SINGLE.redisTemplate.opsForValue().set(LIMIT_KEY + uniqueId, entity);
-    SINGLE.redisTemplate.expire(LIMIT_KEY + uniqueId, 1, TimeUnit.DAYS);
+    RedissonUtil.set(LIMIT_KEY + uniqueId, entity, 25, TimeUnit.HOURS);
     if (second > 0 && entity.getSecond() > second) {
       log.debug("{}超出秒请求限制,限制数{}，请求数{}", uniqueId, second, entity.getSecond());
       return false;
