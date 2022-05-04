@@ -8,8 +8,8 @@
   <artifactId>auth-spring-boot-starter</artifactId>
   <version>2.0.0</version>
 
-  <name>spring-boot-starter-auth</name>
-  <url>https://github.com/seepine/spring-boot-starter-auth</url>
+  <name>auth-spring-boot-starter</name>
+  <url>https://github.com/seepine/auth-spring-boot-starter</url>
   <description>easy auth for springboot</description>
 
   <!--author-->
