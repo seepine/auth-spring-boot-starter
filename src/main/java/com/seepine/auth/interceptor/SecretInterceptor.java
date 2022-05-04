@@ -2,9 +2,9 @@ package com.seepine.auth.interceptor;
 
 import com.seepine.auth.annotation.NotSecret;
 import com.seepine.auth.annotation.Secret;
-import com.seepine.auth.entity.AuthProperties;
 import com.seepine.auth.enums.AuthExceptionType;
 import com.seepine.auth.exception.AuthException;
+import com.seepine.auth.properties.SecretProperties;
 import com.seepine.auth.service.AuthSecretService;
 import com.seepine.auth.util.AnnotationUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -23,11 +23,11 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class SecretInterceptor implements HandlerInterceptor {
 
-  private final AuthProperties authProperties;
+  private final SecretProperties secretProperties;
   private final AuthSecretService secretService;
 
-  public SecretInterceptor(AuthProperties authProperties, AuthSecretService secretService) {
-    this.authProperties = authProperties;
+  public SecretInterceptor(SecretProperties secretProperties, AuthSecretService secretService) {
+    this.secretProperties = secretProperties;
     this.secretService = secretService;
   }
 
@@ -44,17 +44,14 @@ public class SecretInterceptor implements HandlerInterceptor {
       return true;
     }
     // not @Secret and not defaultAllSecret
-    if (!AnnotationUtil.hasAnnotation(handler, Secret.class)
-        && !authProperties.isDefaultAllSecret()) {
+    if (!AnnotationUtil.hasAnnotation(handler, Secret.class) && !secretProperties.getDefaultAll()) {
       return true;
     }
-    String timeSecret = httpServletRequest.getHeader(authProperties.getSecretHeader());
+    String timeSecret = httpServletRequest.getHeader(secretProperties.getHeader());
     if (timeSecret == null || "".equals(timeSecret)) {
       throw new AuthException(AuthExceptionType.NOT_SECRET);
     }
-    if (secretService.verify(timeSecret)) {
-      return true;
-    }
-    throw new AuthException(AuthExceptionType.INVALID_SECRET);
+    secretService.verify(timeSecret);
+    return true;
   }
 }

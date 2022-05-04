@@ -1,11 +1,10 @@
 package com.seepine.auth.interceptor;
 
 import com.seepine.auth.annotation.Expose;
-import com.seepine.auth.annotation.Login;
 import com.seepine.auth.annotation.NotExpose;
-import com.seepine.auth.entity.AuthProperties;
 import com.seepine.auth.enums.AuthExceptionType;
 import com.seepine.auth.exception.AuthException;
+import com.seepine.auth.properties.AuthProperties;
 import com.seepine.auth.util.AnnotationUtil;
 import com.seepine.auth.util.AuthUtil;
 import com.seepine.auth.util.StrUtil;
@@ -33,10 +32,6 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
       HttpServletResponse httpServletResponse,
       Object handler) {
     if (!(handler instanceof HandlerMethod)) {
-      return true;
-    }
-    // 登录接口，直接放行
-    if (AnnotationUtil.hasAnnotation(handler, Login.class)) {
       return true;
     }
     String token = httpServletRequest.getHeader(authProperties.getHeader());

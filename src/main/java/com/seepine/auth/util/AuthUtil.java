@@ -1,13 +1,15 @@
 package com.seepine.auth.util;
 
-import com.seepine.auth.entity.AuthProperties;
+import com.seepine.auth.AutoConfiguration;
 import com.seepine.auth.enums.AuthExceptionType;
 import com.seepine.auth.exception.AuthException;
-import org.springframework.context.annotation.DependsOn;
+import com.seepine.auth.properties.AuthProperties;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,7 @@ import java.util.List;
  * @author seepine
  */
 @Component
-@DependsOn({"authProperties"})
+@AutoConfigureAfter(AutoConfiguration.class)
 public class AuthUtil {
   private static AuthUtil authUtil;
   @Resource private AuthProperties authProperties;
@@ -45,7 +47,11 @@ public class AuthUtil {
    * @return com.seepine.auth:{token}:user
    */
   private static String getUserKey(String token) {
-    return authUtil.authProperties.getCacheKey() + StrUtil.COLON + token + StrUtil.COLON + "user";
+    return authUtil.authProperties.getCachePrefix()
+        + StrUtil.COLON
+        + token
+        + StrUtil.COLON
+        + "user";
   }
 
   /**
@@ -54,7 +60,7 @@ public class AuthUtil {
    * @return com.seepine.auth:{token}:permission
    */
   private static String getPermissionKey(String token) {
-    return authUtil.authProperties.getCacheKey()
+    return authUtil.authProperties.getCachePrefix()
         + StrUtil.COLON
         + token
         + StrUtil.COLON
@@ -176,9 +182,11 @@ public class AuthUtil {
     String token = authUtil.THREAD_LOCAL_TOKEN.get();
     if (StrUtil.isNotBlank(token)) {
       // 刷新用户信息缓存
-      RedissonUtil.expire(getUserKey(token), authUtil.authProperties.getTimeout());
+      RedissonUtil.expire(
+          getUserKey(token), Duration.ofSeconds(authUtil.authProperties.getTimeout()));
       // 刷新用户权限缓存
-      RedissonUtil.expire(getPermissionKey(token), authUtil.authProperties.getTimeout());
+      RedissonUtil.expire(
+          getPermissionKey(token), Duration.ofSeconds(authUtil.authProperties.getTimeout()));
     }
   }
 

@@ -34,11 +34,11 @@ public class RateLimitAspect {
     MethodSignature methodSignature = (MethodSignature) signature;
     RateLimit reqLimit = methodSignature.getMethod().getAnnotation(RateLimit.class);
     if (!RateLimitUtil.verify(
+        RateLimitUtil.getUniqueId(reqLimit.global()),
         reqLimit.second() < 0 ? reqLimit.value() : reqLimit.second(),
         reqLimit.minute(),
         reqLimit.hour(),
-        reqLimit.day(),
-        reqLimit.global())) {
+        reqLimit.day())) {
       throw new AuthException(AuthExceptionType.RATE_LIMIT);
     }
   }

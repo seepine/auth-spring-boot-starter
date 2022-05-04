@@ -1,6 +1,8 @@
 package com.seepine.auth.util;
 
 import com.seepine.auth.entity.RateLimitEntity;
+import com.seepine.auth.enums.AuthExceptionType;
+import com.seepine.auth.exception.AuthException;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,15 +25,14 @@ public class RateLimitUtil {
   /**
    * 验证是否速率限制
    *
+   * @param uniqueId 唯一标识id
    * @param second 秒速率，如5，则一秒最多只能访问5次
    * @param minute 分速率，同上
    * @param hour 时速率
    * @param day 天速率
-   * @param global 是否全局共享
    * @return true/false
    */
-  public static boolean verify(int second, int minute, int hour, int day, boolean global) {
-    String uniqueId = getUniqueId(global);
+  public static boolean verify(String uniqueId, int second, int minute, int hour, int day) {
     Object cache = RedissonUtil.get(LIMIT_KEY + uniqueId);
     RateLimitEntity entity;
     try {
@@ -153,13 +154,15 @@ public class RateLimitUtil {
   public static String getUniqueId(boolean global) {
     HttpServletRequest request = HttpServletUtil.getHttpRequest();
     if (request == null) {
-      throw new IllegalArgumentException("请求不合法");
+      throw new AuthException(AuthExceptionType.NOT_REQUEST);
     }
     if (StrUtil.isBlank(request.getRequestURI())) {
-      throw new IllegalArgumentException("请求不合法");
+      throw new AuthException(AuthExceptionType.NOT_REQUEST);
     }
     if (global) {
-      return base64Encoder.encodeToString(request.getRequestURI().getBytes(StandardCharsets.UTF_8));
+      return base64Encoder.encodeToString(
+          (request.getMethod() + StrUtil.AT + request.getRequestURI())
+              .getBytes(StandardCharsets.UTF_8));
     }
     String ip = IpUtil.getIp(request);
     String ua = request.getHeader("User-Agent");
@@ -171,7 +174,24 @@ public class RateLimitUtil {
           "Mozilla/9.9 (Macintosh; Intel Mac OS X 12_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36 Edg/95.0.1020.44";
     }
     return base64Encoder.encodeToString(
-        (request.getRequestURI() + StrUtil.AT + ip + StrUtil.AT + ua)
+        (request.getMethod()
+                + StrUtil.AT
+                + request.getRequestURI()
+                + StrUtil.AT
+                + ip
+                + StrUtil.AT
+                + ua)
             .getBytes(StandardCharsets.UTF_8));
+  }
+
+  public static String getRequestUri() {
+    HttpServletRequest request = HttpServletUtil.getHttpRequest();
+    if (request == null) {
+      throw new AuthException(AuthExceptionType.NOT_REQUEST);
+    }
+    if (StrUtil.isBlank(request.getRequestURI())) {
+      throw new AuthException(AuthExceptionType.NOT_REQUEST);
+    }
+    return request.getRequestURI();
   }
 }

@@ -1,10 +1,10 @@
 package com.seepine.auth.service.impl;
 
-import com.seepine.auth.entity.AuthProperties;
 import com.seepine.auth.entity.asymmetric.RSA;
 import com.seepine.auth.enums.AuthExceptionType;
 import com.seepine.auth.exception.AuthException;
 import com.seepine.auth.exception.RSAException;
+import com.seepine.auth.properties.SecretProperties;
 import com.seepine.auth.service.AuthSecretService;
 import com.seepine.auth.util.CurrentTimeMillisClock;
 import com.seepine.auth.util.HttpServletUtil;
@@ -14,25 +14,27 @@ import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 public class AuthSecretServiceImpl implements AuthSecretService {
-  AuthProperties authProperties;
+  SecretProperties secretProperties;
   RSA rsa;
   RSA oldRsa;
 
-  public AuthSecretServiceImpl(AuthProperties authProperties) throws RSAException {
-    this.authProperties = authProperties;
-    if (authProperties.isEnableSecret()) {
-      if (authProperties.getRsaPrivateKey() == null) {
-        throw new RSAException("开启secret且未实现SecretService时，必须设置rsaPrivateKey");
+  public AuthSecretServiceImpl(SecretProperties secretProperties) throws RSAException {
+    this.secretProperties = secretProperties;
+    if (secretProperties.getRsaPrivateKey() == null) {
+      return;
+    }
+    try {
+      rsa = new RSA(null, secretProperties.getRsaPrivateKey());
+      if (secretProperties.getOldRsaPrivateKey() != null) {
+        oldRsa = new RSA(null, secretProperties.getOldRsaPrivateKey());
       }
-      rsa = new RSA(null, authProperties.getRsaPrivateKey());
-      if (authProperties.getRsaOldPrivateKey() != null) {
-        oldRsa = new RSA(null, authProperties.getRsaOldPrivateKey());
-      }
+    } catch (Exception e) {
+      throw new RSAException("初始化RSA失败，请检查rsa私钥是否正确");
     }
   }
 
   @Override
-  public boolean verify(String secretValue) throws AuthException {
+  public void verify(String secretValue) throws AuthException {
     String origin;
     try {
       origin = rsa.privateDecrypt(secretValue);
@@ -61,9 +63,8 @@ public class AuthSecretServiceImpl implements AuthSecretService {
           origin,
           nowTime);
     }
-    if (Math.abs(nowTime - originTime) > authProperties.getSecretTimeout()) {
+    if (Math.abs(nowTime - originTime) > secretProperties.getTimeout() * 1000L) {
       throw new AuthException(AuthExceptionType.EXPIRED_SECRET);
     }
-    return true;
   }
 }

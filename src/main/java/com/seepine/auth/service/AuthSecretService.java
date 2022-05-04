@@ -8,5 +8,5 @@ import com.seepine.auth.exception.AuthException;
  * @author seepine
  */
 public interface AuthSecretService {
-  boolean verify(String secretValue) throws AuthException;
+  void verify(String secretValue) throws AuthException;
 }

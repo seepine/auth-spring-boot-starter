@@ -78,6 +78,7 @@ public class RSA {
       initCipher();
     } catch (NoSuchAlgorithmException e) {
       e.printStackTrace();
+      throw new RuntimeException(e.getMessage());
     }
   }
 
@@ -99,6 +100,7 @@ public class RSA {
       initCipher();
     } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
       e.printStackTrace();
+      throw new RuntimeException(e.getMessage());
     }
   }
   /** 初始化公私钥Cipher */

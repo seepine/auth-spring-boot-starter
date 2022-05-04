@@ -5,8 +5,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.seepine</groupId>
-  <artifactId>spring-boot-starter-auth</artifactId>
-  <version>2.0.0-beta.18</version>
+  <artifactId>auth-spring-boot-starter</artifactId>
+  <version>2.0.0</version>
 
   <name>spring-boot-starter-auth</name>
   <url>https://github.com/seepine/spring-boot-starter-auth</url>
@@ -32,13 +32,13 @@
   <!--scm-->
   <scm>
     <url>https://seepine.com</url>
-    <connection>scm:git:https://github.com/seepine/spring-boot-starter-auth.git</connection>
-    <developerConnection>scm:git:https://github.com/seepine/spring-boot-starter-auth.git</developerConnection>
+    <connection>scm:git:https://github.com/seepine/auth-spring-boot-starter.git</connection>
+    <developerConnection>scm:git:https://github.com/seepine/auth-spring-boot-starter.git</developerConnection>
   </scm>
 
   <properties>
     <java.version>1.8</java.version>
-    <spring-boot.version>2.6.6</spring-boot.version>
+    <spring-boot.version>2.6.7</spring-boot.version>
     <redisson.version>3.17.0</redisson.version>
   </properties>
 
@@ -46,6 +46,11 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -63,7 +68,6 @@
       <groupId>org.redisson</groupId>
       <artifactId>redisson-spring-boot-starter</artifactId>
       <version>${redisson.version}</version>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 

@@ -15,7 +15,7 @@ public class CurrentTimeMillisClock {
     new ScheduledThreadPoolExecutor(
             1,
             runnable -> {
-              Thread thread = new Thread(runnable, "current-time-millis");
+              Thread thread = new Thread(runnable, "auth-current-time-millis");
               thread.setDaemon(true);
               return thread;
             })

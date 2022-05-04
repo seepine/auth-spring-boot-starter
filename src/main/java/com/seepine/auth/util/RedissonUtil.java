@@ -18,7 +18,7 @@ public class RedissonUtil {
   private RedissonClient redissonClient;
   private static final long DEFAULT_TIME = 7;
   private static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.DAYS;
-  private static final String REDIS_LOCK_KEY = "redisson_lock:";
+  private static final String REDIS_LOCK_KEY = "auth_redisson_lock:";
 
   RedissonUtil(RedissonClient redissonClient) {
     this.redissonClient = redissonClient;

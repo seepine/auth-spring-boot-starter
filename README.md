@@ -1,4 +1,4 @@
-# spring-boot-starter-auth
+# auth-spring-boot-starter
 
 easy auth for springboot
 
@@ -10,8 +10,8 @@ easy auth for springboot
 
 <dependency>
   <groupId>com.seepine</groupId>
-  <artifactId>spring-boot-starter-auth</artifactId>
-  <version>2.0.0-beta.16</version>
+  <artifactId>auth-spring-boot-starter</artifactId>
+  <version>2.0.0</version>
 </dependency>
 ```
 
@@ -76,25 +76,14 @@ public class Controller {
 
 ### 3.自定义配置
 
-其中常用自定义的配置
+常用自定义的配置
 
-- header: 请求头参数，如{"custom_token":"asfoav5h35v43692"}
-- cacheKey: 缓存redis的key
-- timeout: 登录有效期
-- resetTimeout: 是否自动续租token过期时间
-
-```java
-
-@Configuration
-@AutoConfigureBefore(AuthAutoConfigurer.class)
-public class MyAuthConfig {
-
-  @Bean
-  public AuthProperties authProperties() {
-    return new AuthProperties().header("custom_token")
-      .cacheKey("custom_auth:").timeout(3, TimeUnit.DAYS);
-  }
-}
+```yml
+auth:
+  header: custom_token #请求头参数，如{"custom_token":"asfoav5h35v43692"}
+  cache-prefix: xxx #缓存redis的key
+  timeout: 3600 #登录有效期,单位秒
+  reset-timeout: true #是否自动续租token过期时间
 ```
 
 ## 三、接口加密
@@ -117,20 +106,11 @@ class Main {
 
 ### 2.配置解密私钥
 
-```java
-
-@Configuration
-@AutoConfigureBefore(AuthAutoConfigurer.class)
-public class MyAuthConfig {
-
-  @Bean
-  public AuthProperties authProperties() {
-    return new AuthProperties()
-      .enableSecret(true)
-      //.secretTimeout(4 * 60 * 60 * 1000) 配置前后端允许的时间差，默认4小时
-      .rsaPrivateKey("...");
-  }
-}
+```yml
+auth:
+  secret:
+    rsa-private-key: xxx #rsa私钥，配置该项则开启
+    timeout: 60 #允许超时时间，单位秒，默认为3分钟
 ```
 
 ### 3.指定接口需要密文鉴权
@@ -156,6 +136,16 @@ public class Controller {
 ```json
 {
   "secret": "xxxxxxxxxxxxxxxxxx"
+}
+```
+
+### 5.重写规则
+
+若想自定义规则，可实现该接口并注入bean即可
+
+```java
+public interface AuthSecretService {
+  void verify(String secretValue) throws AuthException;
 }
 ```
 
