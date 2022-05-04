@@ -17,7 +17,6 @@ easy auth for springboot
 
 ### 2.注解简介
 
-- @Login 登录接口使用
 - @Expose/@NotExpose 暴露/不暴露接口
 - @Secret/@NotSecret 接口请求头加密，可大大避免通过F12得知接口地址和传参恶意调用
 - @Permission/@PermissionPrefix 接口鉴权，快速实现用户、角色、权限功能
@@ -30,18 +29,18 @@ easy auth for springboot
 
 ### 1.获取token
 
-在登录接口使用注解`@Login`，获取到用户信息后调用AuthUtil.loginSuccess，该方法将会返回用户token 并且可传入不同用户信息，比如User，比如UserVo
+登录接口使用注解`@Expose`暴露，获取到用户信息后调用AuthUtil.loginSuccess，该方法将会返回用户token 并且可传入不同用户信息，比如User，比如UserVo
 
 ```java
 public class Controller {
-  @Login
+  @Expose
   @GetMapping("/login/{username}/{password}")
   public R login(@PathVariable String username, @PathVariable String password) {
     User user = userService.getByUsername(username, password);
     return R.ok(AuthUtil.loginSuccess(user));
   }
 
-  @Login
+  @Expose
   @GetMapping("/login/{code}")
   public R login(@PathVariable String code) {
     UserVO user = userService.getByCode(code);
