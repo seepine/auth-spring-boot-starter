@@ -6,12 +6,16 @@ easy auth for springboot
 
 ### 1.引入依赖
 
+- Latest
+  Version: [![Maven Central](https://img.shields.io/maven-central/v/com.seepnie/auth-spring-boot-starter.svg)](https://search.maven.org/search?q=g:com.seepine%20a:auth-spring-boot-starter)
+- Maven:
+
 ```xml
 
 <dependency>
   <groupId>com.seepine</groupId>
   <artifactId>auth-spring-boot-starter</artifactId>
-  <version>2.0.0</version>
+  <version>${latest-version}</version>
 </dependency>
 ```
 
@@ -25,7 +29,7 @@ easy auth for springboot
 
 ## 二、基本使用
 
-> @Login/@Expose/@NotExpose
+> @Expose/@NotExpose
 
 ### 1.获取token
 

@@ -30,6 +30,10 @@ public class RedissonUtil {
     redissonUtil.redissonClient = this.redissonClient;
   }
 
+  public static RedissonClient getRedissonClient() {
+    return redissonUtil.redissonClient;
+  }
+
   /**
    * 设置过期时间
    *
