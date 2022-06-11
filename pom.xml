@@ -6,7 +6,7 @@
 
   <groupId>com.seepine</groupId>
   <artifactId>auth-spring-boot-starter</artifactId>
-  <version>2.0.1</version>
+  <version>2.0.2</version>
 
   <name>auth-spring-boot-starter</name>
   <url>https://github.com/seepine/auth-spring-boot-starter</url>
@@ -17,8 +17,7 @@
     <developer>
       <name>seepine</name>
       <email>seepine@outlook.com</email>
-      <organization>https://seepine.com</organization>
-      <organizationUrl>https://seepine.com</organizationUrl>
+      <url>https://seepine.com</url>
     </developer>
   </developers>
   <!--licenses-->
@@ -31,13 +30,19 @@
   </licenses>
   <!--scm-->
   <scm>
-    <url>https://seepine.com</url>
+    <url>https://github.com/seepine/auth-spring-boot-starter</url>
     <connection>scm:git:https://github.com/seepine/auth-spring-boot-starter.git</connection>
     <developerConnection>scm:git:https://github.com/seepine/auth-spring-boot-starter.git</developerConnection>
   </scm>
 
   <properties>
     <java.version>1.8</java.version>
+    <encoding>UTF-8</encoding>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
+
     <spring-boot.version>2.7.0</spring-boot.version>
     <redisson.version>3.17.3</redisson.version>
   </properties>
@@ -86,50 +91,54 @@
 
   <build>
     <plugins>
-      <!-- doc plugin,Maven API文档生成插件-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.1.0</version>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <encoding>${encoding}</encoding>
+        </configuration>
       </plugin>
-      <!-- resources plugin,Maven 资源插件-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.1</version>
+        <inherited>false</inherited>
         <executions>
           <execution>
-            <id>attach-sources</id>
+            <phase>package</phase>
             <goals>
               <goal>jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
-      <!-- compiler plugin,Maven 编译插件 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.3.0</version>
+        <inherited>false</inherited>
         <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-          <showWarnings>true</showWarnings>
+          <nohelp>true</nohelp>
+          <charset>${encoding}</charset>
+          <encoding>${encoding}</encoding>
+          <docencoding>${encoding}</docencoding>
         </configuration>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
-      <!-- gpg plugin,用于签名认证 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
         <version>1.6</version>
+        <inherited>false</inherited>
         <executions>
           <execution>
             <id>sign-artifacts</id>
@@ -137,39 +146,45 @@
             <goals>
               <goal>sign</goal>
             </goals>
+            <configuration>
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
+            </configuration>
           </execution>
         </executions>
       </plugin>
-      <!--staging plugin,用于自动执行发布阶段(免手动)-->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.7</version>
+        <version>1.6.13</version>
+        <inherited>false</inherited>
         <extensions>true</extensions>
         <configuration>
-          <serverId>sonatype</serverId>
+          <serverId>ossrh</serverId>
           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
-      <!-- release plugin,用于发布到release仓库部署插件 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <version>2.4.2</version>
+        <inherited>false</inherited>
       </plugin>
     </plugins>
   </build>
-  <!-- 这里引入 Settings.xml 中设置的sonatype -->
+
   <distributionManagement>
-    <snapshotRepository>
-      <id>sonatype</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
     <repository>
-      <id>sonatype</id>
+      <id>ossrh</id>
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </snapshotRepository>
   </distributionManagement>
 
 </project>
