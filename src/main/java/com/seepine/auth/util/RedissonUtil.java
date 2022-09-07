@@ -156,7 +156,10 @@ public class RedissonUtil {
   public static void sync(Object key, Apply apply) {
     try {
       syncE(key, apply::run);
+    } catch (RuntimeException e) {
+      throw e;
     } catch (Exception e) {
+      e.printStackTrace();
       throw new IllegalArgumentException(e.getMessage());
     }
   }
@@ -187,7 +190,10 @@ public class RedissonUtil {
   public static <T> T sync(Object key, ApplyAs<T> apply) {
     try {
       return syncE(key, apply::run);
+    } catch (RuntimeException e) {
+      throw e;
     } catch (Exception e) {
+      e.printStackTrace();
       throw new IllegalArgumentException(e.getMessage());
     }
   }
