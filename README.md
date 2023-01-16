@@ -1,13 +1,17 @@
-# auth-spring-boot-starter
+# 本仓库已停止维护，请使用用法一致的https://github.com/seepine/secret
 
-easy auth for springboot
 
-## 一、集成
 
-### 1.引入依赖
+# ~~auth-spring-boot-starter~~
+
+~~easy auth for springboot~~
+
+## ~~一、集成~~
+
+### ~~1.引入依赖~~
 
 - Latest
-  Version: [![Maven Central](https://img.shields.io/maven-central/v/com.seepnie/auth-spring-boot-starter.svg)](https://search.maven.org/search?q=g:com.seepine%20a:auth-spring-boot-starter)
+  Version: [![Maven Central](https://img.shields.io/maven-central/v/com.seepine/auth-spring-boot-starter.svg)](https://search.maven.org/search?q=g:com.seepine%20a:auth-spring-boot-starter)
 - Maven:
 
 ```xml
@@ -19,7 +23,7 @@ easy auth for springboot
 </dependency>
 ```
 
-### 2.注解简介
+### ~~2.注解简介~~
 
 - @Expose/@NotExpose 暴露/不暴露接口
 - @Secret/@NotSecret 接口请求头加密，可大大避免通过F12得知接口地址和传参恶意调用
@@ -27,11 +31,11 @@ easy auth for springboot
 - @RateLimit 接口速率限制，支持秒/分/时/天，可用于例如短信/邮箱发送、注册、下单、支付等，被恶意刷量
 - @Log 快速实现日志记录
 
-## 二、基本使用
+## ~~二、基本使用~~
 
-> @Expose/@NotExpose
+> ~~@Expose/@NotExpose~~
 
-### 1.获取token
+### ~~1.获取token~~
 
 登录接口使用注解`@Expose`暴露，获取到用户信息后调用AuthUtil.loginSuccess，该方法将会返回用户token 并且可传入不同用户信息，比如User，比如UserVo
 
